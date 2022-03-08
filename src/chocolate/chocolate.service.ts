@@ -24,8 +24,6 @@ export class ChocolateService {
       description: input.description,
       completed: false,
     };
-    console.log(chocolate);
-
     this.chocolates.push(chocolate);
     return this.chocolates;
   }
@@ -38,7 +36,6 @@ export class ChocolateService {
     }
 
     this.chocolates[chocoIndex].completed = completed;
-    console.log('this.chocolates[chocoIndex] >', this.chocolates[chocoIndex]);
     return this.chocolates[chocoIndex];
   }
 
