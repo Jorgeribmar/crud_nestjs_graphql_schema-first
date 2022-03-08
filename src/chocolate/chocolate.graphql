@@ -1,0 +1,27 @@
+type Chocolate {
+  id: ID
+  title: String
+  description: String
+  completed: Boolean
+}
+
+input AddChocolateInput {
+  title: String!
+  description: String!
+}
+
+input UpdateChocolateInput {
+  id: ID
+  completed: Boolean
+}
+
+type Query {
+  getChocolates: [Chocolate]
+  getChocolate(id: ID): Chocolate
+}
+
+type Mutation {
+  addChocolate(input: AddChocolateInput): [Chocolate]
+  updateChocolate(input: UpdateChocolateInput): Chocolate
+  deleteChocolate(id: ID): [Chocolate]
+}
