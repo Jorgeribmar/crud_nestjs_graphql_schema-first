@@ -43,6 +43,8 @@ $ yarn start:dev
 
 ```
 
+API graphQL running on localhost:3000/graphql
+
 
 ## Support
 
