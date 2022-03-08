@@ -34,7 +34,7 @@ export class ChocolateService {
     const chocoIndex = this.chocolates.findIndex((choco) => choco.id === id);
 
     if (chocoIndex === -1) {
-      throw new HttpException('Task not found', 404);
+      throw new HttpException('Choco not found', 404);
     }
 
     this.chocolates[chocoIndex].completed = completed;
@@ -45,7 +45,7 @@ export class ChocolateService {
   deleteChocolate(id: string): Chocolate[] {
     const chocoIndex = this.chocolates.findIndex((choco) => choco.id === id);
     if (chocoIndex === -1) {
-      throw new HttpException('Task not found', 404);
+      throw new HttpException('Choco not found', 404);
     }
 
     this.chocolates.splice(chocoIndex, 1);
