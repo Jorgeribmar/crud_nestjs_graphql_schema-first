@@ -21,7 +21,8 @@ type Query {
 }
 
 type Mutation {
-  addChocolate(input: AddChocolateInput): [Chocolate]
+  addChocolate(input: AddChocolateInput): Chocolate
   updateChocolate(input: UpdateChocolateInput): Chocolate
-  deleteChocolate(id: ID): [Chocolate]
+  deleteChocolate(id: ID): Chocolate
+  deleteAllChocolate: Chocolate
 }

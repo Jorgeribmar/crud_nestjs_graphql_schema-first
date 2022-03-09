@@ -1,51 +1,84 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { AddChocolateInput } from './dto/add-chocolate.input';
 import { UpdateChocolateInput } from './dto/update-chocolate.input';
-import { Chocolate } from './entities/chocolate.entity';
-import { CHOCOLATES } from './mocks/chocolates.mocks';
+import { Chocolate } from './model/chocolates.model';
+import { Model } from 'mongoose';
+
+// import { Chocolate } from './entities/chocolate.entity';
+// import { CHOCOLATES } from './model/chocolates.model';
 
 @Injectable()
 export class ChocolateService {
-  chocolates = CHOCOLATES;
+  constructor(
+    @InjectModel('Chocolate') private readonly chocolateModel: Model<Chocolate>,
+  ) {}
 
-  getChocolates(): Chocolate[] {
-    return this.chocolates;
+  async getChocolates() {
+    const chocolates = await this.chocolateModel.find();
+    console.log('getAll', chocolates);
+
+    return chocolates;
   }
 
-  getChocolate(id: string): Chocolate {
-    return this.chocolates.find((choco) => choco.id === id);
-  }
-
-  async addChocolate(input: AddChocolateInput): Promise<Chocolate[]> {
-    const lastChoco = this.chocolates.slice(-1).pop();
-    const chocolate: Chocolate = {
-      id: (Number(lastChoco.id) + 1).toString(),
-      title: input.title,
-      description: input.description,
-      completed: false,
-    };
-    this.chocolates.push(chocolate);
-    return this.chocolates;
-  }
-
-  updateChocolate({ id, completed }: UpdateChocolateInput): Chocolate {
-    const chocoIndex = this.chocolates.findIndex((choco) => choco.id === id);
-
-    if (chocoIndex === -1) {
-      throw new HttpException('Choco not found', 404);
+  async getChocolate(id: string) {
+    const chocolate = await this.chocolateModel.findById(id);
+    if (!chocolate) {
+      throw new NotFoundException('No chocolate with this ID');
     }
+    console.log('getOne', chocolate);
 
-    this.chocolates[chocoIndex].completed = completed;
-    return this.chocolates[chocoIndex];
+    return chocolate;
   }
 
-  deleteChocolate(id: string): Chocolate[] {
-    const chocoIndex = this.chocolates.findIndex((choco) => choco.id === id);
-    if (chocoIndex === -1) {
-      throw new HttpException('Choco not found', 404);
-    }
+  async addChocolate(input: AddChocolateInput) {
+    const newChocolate = new this.chocolateModel(input);
+    const addChocolate = await newChocolate.save();
+    // console.log('Add', addChocolate);
 
-    this.chocolates.splice(chocoIndex, 1);
-    return this.chocolates;
+    return addChocolate;
+  }
+
+  async updateChocolate({ id, completed }: UpdateChocolateInput) {
+    const updateChocolate = await this.chocolateModel.findById(id);
+    if (!updateChocolate) {
+      throw new NotFoundException('No chocolate with this ID');
+    }
+    if (completed) {
+      updateChocolate.completed = completed;
+    }
+    updateChocolate.save();
+    console.log('Update', updateChocolate);
+
+    return updateChocolate;
+    // const chocoIndex = this.chocolates.findIndex(
+    //   (chocolate) => chocolate.id === id,
+    // );
+
+    // if (chocoIndex === -1) {
+    //   throw new HttpException('Chocolate not found', 404);
+    // }
+
+    // this.chocolates[chocoIndex].completed = completed;
+    // return this.chocolates[chocoIndex];
+  }
+
+  async deleteChocolate(id: string) {
+    const deleteChocolate = await this.chocolateModel.findByIdAndDelete(id);
+    if (!deleteChocolate) {
+      throw new NotFoundException('Chocolate not found with this ID');
+    }
+    console.log('delete', deleteChocolate);
+
+    return deleteChocolate;
+  }
+
+  async deleteAllChocolate() {
+    const deleteAllChocolate = await this.chocolateModel.deleteMany();
+    if (deleteAllChocolate.deletedCount === 0) {
+      throw new NotFoundException('Nothing to delete');
+    }
+    console.log(deleteAllChocolate);
+    return deleteAllChocolate;
   }
 }
