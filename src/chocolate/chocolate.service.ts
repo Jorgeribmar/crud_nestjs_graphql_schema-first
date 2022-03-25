@@ -1,22 +1,24 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { AddChocolateInput } from './dto/add-chocolate.input';
 import { UpdateChocolateInput } from './dto/update-chocolate.input';
 import { Chocolate } from './model/chocolates.model';
 import { Model } from 'mongoose';
+import { ConfigService } from '@nestjs/config';
 
 // import { Chocolate } from './entities/chocolate.entity';
 // import { CHOCOLATES } from './model/chocolates.model';
 
 @Injectable()
 export class ChocolateService {
+  #logger = new Logger('Logger');
   constructor(
     @InjectModel('Chocolate') private readonly chocolateModel: Model<Chocolate>,
+    private configService: ConfigService,
   ) {}
 
   async getChocolates() {
     const chocolates = await this.chocolateModel.find();
-    console.log('getAll', chocolates);
 
     return chocolates;
   }
@@ -26,7 +28,7 @@ export class ChocolateService {
     if (!chocolate) {
       throw new NotFoundException('No chocolate with this ID');
     }
-    console.log('getOne', chocolate);
+    this.#logger.debug('getOne', chocolate);
 
     return chocolate;
   }
